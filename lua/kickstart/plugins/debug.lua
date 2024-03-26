@@ -20,6 +20,7 @@ return {
 
     -- Add your own debuggers here
     'leoluz/nvim-dap-go',
+    'mfussenegger/nvim-dap-python'
   },
   config = function()
     local dap = require 'dap'
@@ -47,6 +48,7 @@ return {
     vim.keymap.set('n', '<F1>', dap.step_into, { desc = 'Debug: Step Into' })
     vim.keymap.set('n', '<F2>', dap.step_over, { desc = 'Debug: Step Over' })
     vim.keymap.set('n', '<F3>', dap.step_out, { desc = 'Debug: Step Out' })
+    vim.keymap.set('n', '<F4>', dap.terminate, { desc = 'Debug: Terminate' })
     vim.keymap.set('n', '<leader>b', dap.toggle_breakpoint, { desc = 'Debug: Toggle Breakpoint' })
     vim.keymap.set('n', '<leader>B', function()
       dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ')
@@ -83,5 +85,31 @@ return {
 
     -- Install golang specific config
     require('dap-go').setup()
+
+    require('dap-python').setup('~/.venvs/dpy/bin/python')
+    --Django config for dap
+    table.insert(dap.configurations.python, {
+      {
+        type = 'python',
+        request = 'launch',
+        name = 'Django',
+        program = '${workspaceFolder}/manage.py',
+        args = { 'runserver'},
+        django = true,
+      },
+    })
+
+    -- Keymap to run Django servers
+    -- vim.keymap.nnoremap('<leader>dr', function()
+    vim.keymap.set('n', '<F6>', function()
+      dap.run({
+        type = 'python',
+        request = 'launch',
+        name = 'Django',
+        program = '${workspaceFolder}/manage.py',
+        args = { 'runserver'},
+        django = true,
+      })
+    end, { desc = 'Debug: Run Django server' })
   end,
 }
