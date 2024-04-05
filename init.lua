@@ -204,7 +204,13 @@ require('lazy').setup({
     priority = 1000,
     opts = {},
     config = function()
-      vim.cmd.colorscheme 'tokyonight'
+      -- local currentHour = tonumber(os.date("%H"))
+      -- if currentHour >= 12 or currentHour < 6 then
+      --   vim.cmd.colorscheme 'tokyonight-storm'
+      -- else
+      --   vim.cmd.colorscheme 'tokyonight-day'
+      -- end
+      vim.cmd.colorscheme 'tokyonight-storm'
     end
   },
 
@@ -706,7 +712,7 @@ vim.keymap.set("n", "<leader>xq", function() require("trouble").toggle("quickfix
 vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist") end)
 vim.keymap.set("n", "gR", function() require("trouble").toggle("lsp_references") end)
 
-local signs = { Error = " ", Warning = " ", Hint = " ", Information = " " }
+local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
 for type, icon in pairs(signs) do
   local hl = "DiagnosticSign" .. type
   vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
