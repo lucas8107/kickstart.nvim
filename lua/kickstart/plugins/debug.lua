@@ -89,14 +89,23 @@ return {
     require('dap-python').setup('~/.venvs/dpy/bin/python')
     --Django config for dap
     table.insert(dap.configurations.python, {
-      {
-        type = 'python',
-        request = 'launch',
-        name = 'Django',
-        program = '${workspaceFolder}/manage.py',
-        args = { 'runserver'},
-        django = true,
-      },
+      type = 'python',
+      request = 'launch',
+      name = 'Django',
+      program = '${workspaceFolder}/manage.py',
+      args = { 'runserver'},
+      django = true,
+    })
+
+    table.insert(dap.configurations.python, {
+      type = 'python',
+      request = 'launch',
+      name = 'Pytest',
+      module = 'pytest',
+      args = function ()
+        local args_string = vim.fn.input('Arguments: ')
+        return vim.split(args_string, ' ', {trimempty=true}) or ''
+      end,
     })
 
     -- Keymap to run Django servers
