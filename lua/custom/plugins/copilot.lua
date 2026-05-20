@@ -1,4 +1,1 @@
-return {
-    "github/copilot.vim",
-    branch = "release",
-}
+vim.pack.add({{ src = 'https://github.com/github/copilot.vim', version = 'release' }})

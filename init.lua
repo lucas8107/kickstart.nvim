@@ -213,77 +213,6 @@ do
   -- or just use <C-\><C-n> to exit terminal mode
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
---   {
---     -- Set lualine as statusline
---     'nvim-lualine/lualine.nvim',
---     -- See `:help lualine.txt`
---     opts = {
---       options = {
---         icons_enabled = false,
---         theme = 'onedark',
---         component_separators = '|',
---         section_separators = '',
---       },
---     },
---   },
---
---   {
---     -- Add indentation guides even on blank lines
---     'lukas-reineke/indent-blankline.nvim',
---     -- Enable `lukas-reineke/indent-blankline.nvim`
---     -- See `:help ibl`
---     main = 'ibl',
---     opts = {},
---   },
---
---   -- "gc" to comment visual regions/lines
---   { 'numToStr/Comment.nvim', opts = {} },
---
---   -- Fuzzy Finder (files, lsp, etc)
---   {
---     'nvim-telescope/telescope.nvim',
---     branch = '0.1.x',
---     dependencies = {
---       'nvim-lua/plenary.nvim',
---       -- Fuzzy Finder Algorithm which requires local dependencies to be built.
---       -- Only load if `make` is available. Make sure you have the system
---       -- requirements installed.
---       {
---         'nvim-telescope/telescope-fzf-native.nvim',
---         -- NOTE: If you are having trouble with this installation,
---         --       refer to the README for telescope-fzf-native for more instructions.
---         build = 'make',
---         cond = function()
---           return vim.fn.executable 'make' == 1
---         end,
---       },
---     },
---   },
---
---   {
---     -- Highlight, edit, and navigate code
---     'nvim-treesitter/nvim-treesitter',
---     dependencies = {
---       'nvim-treesitter/nvim-treesitter-textobjects',
---     },
---     build = ':TSUpdate',
---   },
---
---   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
---   --       These are some example plugins that I've included in the kickstart repository.
---   --       Uncomment any of the lines below to enable them.
---   -- require 'kickstart.plugins.autoformat',
---   require 'kickstart.plugins.debug',
---
---   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
---   --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
---   --    up-to-date with whatever is in the kickstart repo.
---   --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
---   --
---   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
---   { import = 'custom.plugins' },
--- }, {})
-
   -- TIP: Disable arrow keys in normal mode
   -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
   -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -428,16 +357,16 @@ do
   --
   -- See `:help gitsigns` to understand what each configuration key does.
   -- Adds git related signs to the gutter, as well as utilities for managing changes
-  vim.pack.add { gh 'lewis6991/gitsigns.nvim' }
-  require('gitsigns').setup {
-    signs = {
-      add = { text = '+' }, ---@diagnostic disable-line: missing-fields
-      change = { text = '~' }, ---@diagnostic disable-line: missing-fields
-      delete = { text = '_' }, ---@diagnostic disable-line: missing-fields
-      topdelete = { text = '‾' }, ---@diagnostic disable-line: missing-fields
-      changedelete = { text = '~' }, ---@diagnostic disable-line: missing-fields
-    },
-  }
+  -- vim.pack.add { gh 'lewis6991/gitsigns.nvim' }
+  -- require('gitsigns').setup {
+  --   signs = {
+  --     add = { text = '+' }, ---@diagnostic disable-line: missing-fields
+  --     change = { text = '~' }, ---@diagnostic disable-line: missing-fields
+  --     delete = { text = '_' }, ---@diagnostic disable-line: missing-fields
+  --     topdelete = { text = '‾' }, ---@diagnostic disable-line: missing-fields
+  --     changedelete = { text = '~' }, ---@diagnostic disable-line: missing-fields
+  --   },
+  -- }
 
   -- Useful plugin to show you pending keybinds.
   vim.pack.add { gh 'folke/which-key.nvim' }
@@ -497,11 +426,13 @@ do
   }
 
   -- Add/delete/replace surroundings (brackets, quotes, etc.)
+  -- NOTE: mini.surround is disabled in favour of kylechui/nvim-surround
+  -- (configured in lua/custom/plugins/surround.lua)
   --
   -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
   -- - sd'   - [S]urround [D]elete [']quotes
   -- - sr)'  - [S]urround [R]eplace [)] [']
-  require('mini.surround').setup()
+  -- require('mini.surround').setup()
 
   -- Simple and easy statusline.
   --  You could remove this setup call if you don't like it,
@@ -1042,7 +973,7 @@ do
   -- require 'kickstart.plugins.lint'
   -- require 'kickstart.plugins.autopairs'
   -- require 'kickstart.plugins.neo-tree'
-  -- require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
+  require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
 
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --
@@ -1050,47 +981,30 @@ do
   require 'custom.plugins'
 end
 
-local harpoon = require("harpoon")
+do
+  -- Lua
+  vim.keymap.set("n", "<leader>xx", function() require("trouble").toggle() end)
+  vim.keymap.set("n", "<leader>xw", function() require("trouble").toggle("workspace_diagnostics") end)
+  vim.keymap.set("n", "<leader>xd", function() require("trouble").toggle("document_diagnostics") end)
+  vim.keymap.set("n", "<leader>xq", function() require("trouble").toggle("quickfix") end)
+  vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist") end)
+  vim.keymap.set("n", "gR", function() require("trouble").toggle("lsp_references") end)
 
--- REQUIRED
-harpoon:setup({
-  settings = {
-    save_on_toggle = true
-  }
-})
--- REQUIRED
+  local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+  local signs = { Error = " ", Warning = " ", Hint = " ", Information = " " }
+  for type, icon in pairs(signs) do
+    local hl = "DiagnosticSign" .. type
+    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+  end
 
-vim.keymap.set("n", "<C-a>", function() harpoon:list():append() end)
-vim.keymap.set("n", "<C-h>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
 
--- vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
-vim.keymap.set("n", "<leader>1", function() harpoon:list():select(1) end, { desc = 'Harpoon 1' })
-vim.keymap.set("n", "<leader>2", function() harpoon:list():select(2) end, { desc = 'Harpoon 2' })
-vim.keymap.set("n", "<leader>3", function() harpoon:list():select(3) end, { desc = 'Harpoon 3' })
-vim.keymap.set("n", "<leader>4", function() harpoon:list():select(4) end, { desc = 'Harpoon 4' })
+  -- Telescope file_browser
+  vim.keymap.set("n", "<space>fb", ":Telescope file_browser<CR>")
+  vim.keymap.set("n", "<space>Fb", ":Telescope file_browser path=%:p:h select_buffer=true<CR>")
 
--- Lua
-vim.keymap.set("n", "<leader>xx", function() require("trouble").toggle() end)
-vim.keymap.set("n", "<leader>xw", function() require("trouble").toggle("workspace_diagnostics") end)
-vim.keymap.set("n", "<leader>xd", function() require("trouble").toggle("document_diagnostics") end)
-vim.keymap.set("n", "<leader>xq", function() require("trouble").toggle("quickfix") end)
-vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist") end)
-vim.keymap.set("n", "gR", function() require("trouble").toggle("lsp_references") end)
-
-local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
--- local signs = { Error = " ", Warning = " ", Hint = " ", Information = " " }
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+  -- Todo Comments
+  vim.keymap.set("n", "<space>st", ":TodoTelescope<CR>")
 end
-
-
--- Telescope file_browser
-vim.keymap.set("n", "<space>fb", ":Telescope file_browser<CR>")
-vim.keymap.set("n", "<space>Fb", ":Telescope file_browser path=%:p:h select_buffer=true<CR>")
-
--- Todo Comments
-vim.keymap.set("n", "<space>st", ":TodoTelescope<CR>")
 
 
 -- The line beneath this is called `modeline`. See `:help modeline`
